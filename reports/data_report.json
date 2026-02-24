@@ -1,0 +1,9 @@
+{
+  "rows": 62397712,
+  "users": 313670,
+  "items": 17172,
+  "rating_min": 1.0,
+  "rating_max": 10.0,
+  "rating_mean": 7.431960421882136,
+  "duplicate_user_item_pairs": 0
+}
