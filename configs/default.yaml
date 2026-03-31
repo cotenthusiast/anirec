@@ -1,0 +1,27 @@
+# ──────────────────────────────────────────────
+# anime-recommender default configuration
+# ──────────────────────────────────────────────
+
+paths:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  ratings_parquet: "data/processed/ratings.parquet"
+  ratings_sample_parquet: "data/processed/ratings_sample.parquet"
+  items_parquet: "data/processed/items.parquet"
+  train_parquet: "data/processed/train.parquet"
+  val_parquet: "data/processed/val.parquet"
+  test_parquet: "data/processed/test.parquet"
+
+prepare:
+  drop_nonpositive: false
+  sample_n: 200_000
+  threads: 4
+
+split:
+  positive_threshold: 8.0
+  min_positive_per_user: 3
+  seed: "42"
+  threads: 4
+
+eval:
+  default_k: 10
