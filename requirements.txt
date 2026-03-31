@@ -1,4 +1,3 @@
-pandas>=2.0
-numpy
-pytest
-duckdb
+duckdb>=0.10
+numpy>=1.24
+pyyaml>=6.0
