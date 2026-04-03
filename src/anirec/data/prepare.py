@@ -17,7 +17,7 @@ import duckdb
 
 RATINGS_ALIASES: dict[str, set[str]] = {
     "user_id": {"user_id", "userid", "user", "uid", "profile", "profile_id"},
-    "item_id": {"anime_id", "item_id", "mal_id", "anime", "item", "id"},
+    "item_id": {"anime_id", "item_id", "mal_id", "anime", "item", "id", "anime_uid"},
     "rating": {"rating", "score", "stars", "value", "user_score", "mean"},
 }
 
@@ -168,24 +168,24 @@ def run(
     con.execute(f"PRAGMA threads={int(threads)};")
     con.execute("PRAGMA enable_progress_bar=true;")
 
-    where_extra = "AND r > 0" if drop_nonpositive else ""
+    where_extra = "AND r > 0"
 
     con.execute("DROP TABLE IF EXISTS cleaned_ratings;")
     con.execute(
         f"""
         CREATE TABLE cleaned_ratings AS
         SELECT
-            TRY_CAST(u AS BIGINT)  AS user_id,
-            TRY_CAST(i AS BIGINT)  AS item_id,
-            TRY_CAST(r AS DOUBLE)  AS rating
+            DENSE_RANK() OVER (ORDER BY u)  AS user_id,
+            TRY_CAST(i AS BIGINT)           AS item_id,
+            TRY_CAST(r AS DOUBLE)           AS rating
         FROM (
             SELECT
-                {user_col}   AS u,
-                {item_col}   AS i,
-                {rating_col} AS r
+                CAST({user_col} AS VARCHAR)  AS u,
+                {item_col}                   AS i,
+                {rating_col}                 AS r
             FROM read_csv_auto('{ratings_path.as_posix()}', header=true)
         )
-        WHERE TRY_CAST(u AS BIGINT) IS NOT NULL
+        WHERE u IS NOT NULL
           AND TRY_CAST(i AS BIGINT) IS NOT NULL
           AND TRY_CAST(r AS DOUBLE) IS NOT NULL
           {where_extra}

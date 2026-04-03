@@ -25,3 +25,6 @@ split:
 
 eval:
   default_k: 10
+
+models:
+  bayesian_m: 524
