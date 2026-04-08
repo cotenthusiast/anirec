@@ -117,7 +117,6 @@ def run(
     raw_dir: str = "data/raw",
     out_dir: str = "data/processed",
     ratings_csv: str | None = None,
-    drop_nonpositive: bool = False,
     sample_n: int = 200_000,
     threads: int = 4,
 ) -> None:
@@ -131,8 +130,6 @@ def run(
         Destination for Parquet outputs.
     ratings_csv : str | None
         Explicit path to a ratings CSV.  Auto-detected when *None*.
-    drop_nonpositive : bool
-        Drop rows where rating ≤ 0 (common for unrated / −1 / 0).
     sample_n : int
         Number of rows to write to ``ratings_sample.parquet``.
     threads : int
@@ -168,8 +165,6 @@ def run(
     con.execute(f"PRAGMA threads={int(threads)};")
     con.execute("PRAGMA enable_progress_bar=true;")
 
-    where_extra = "AND r > 0"
-
     con.execute("DROP TABLE IF EXISTS cleaned_ratings;")
     con.execute(
         f"""
@@ -188,7 +183,7 @@ def run(
         WHERE u IS NOT NULL
           AND TRY_CAST(i AS BIGINT) IS NOT NULL
           AND TRY_CAST(r AS DOUBLE) IS NOT NULL
-          {where_extra}
+          AND r > 0
         """
     )
 

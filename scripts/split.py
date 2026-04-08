@@ -29,6 +29,7 @@ def main() -> None:
         out_dir=p["processed_dir"],
         positive_threshold=s["positive_threshold"],
         min_positive_per_user=s["min_positive_per_user"],
+        holdout_per_user=s["holdout_per_user"],
         seed=str(s["seed"]),
         threads=s["threads"],
     )

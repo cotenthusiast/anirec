@@ -23,6 +23,7 @@ def run(
     out_dir: str = "data/processed",
     positive_threshold: float = 8.0,
     min_positive_per_user: int = 20,
+    holdout_per_user: int = 5,
     seed: str = "42",
     threads: int = 4,
 ) -> None:
@@ -38,6 +39,8 @@ def run(
         Minimum rating to count as a positive interaction.
     min_positive_per_user : int
         Users with fewer positives than this are excluded.
+    holdout_per_user : int
+        Number of items held out per user for each of test and val.
     seed : str
         Seed string hashed into the deterministic ordering.
     threads : int
@@ -100,13 +103,16 @@ def run(
     """)
 
     # ── split tables ─────────────────────────────────────────────────
-    con.execute("""
+    test_end = holdout_per_user
+    val_start = holdout_per_user + 1
+    val_end = holdout_per_user * 2
+    con.execute(f"""
         CREATE OR REPLACE TABLE split_test AS
-        SELECT user_id, item_id, rating FROM ranked_pos WHERE rn BETWEEN 1 AND 5
+        SELECT user_id, item_id, rating FROM ranked_pos WHERE rn BETWEEN 1 AND {test_end}
     """)
-    con.execute("""
+    con.execute(f"""
         CREATE OR REPLACE TABLE split_val AS
-        SELECT user_id, item_id, rating FROM ranked_pos WHERE rn BETWEEN 6 AND 10
+        SELECT user_id, item_id, rating FROM ranked_pos WHERE rn BETWEEN {val_start} AND {val_end}
     """)
     con.execute(f"""
         CREATE OR REPLACE TABLE split_train AS

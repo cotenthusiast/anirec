@@ -29,7 +29,7 @@ def main() -> None:
     ap.add_argument("--load", type=str, default=None, help="Load model from path instead of fitting")
     args = ap.parse_args()
 
-    os.makedirs("models", exist_ok=True)
+    os.makedirs(p["models_dir"], exist_ok=True)
 
     cfg = load_config(args.config)
     p = cfg["paths"]
@@ -72,7 +72,7 @@ def main() -> None:
     if hasattr(model, '_user_map'):
         overlap = len(set(model._user_map.keys()) & set(user_ids))
         print(f"Overlap: {overlap} / {len(user_ids)} test users found in training")
-        model.save("models/svd")
+        model.save(p["svd_model_path"])
 
     recs = model.recommend(user_ids, k)
     r = recall_at_k(recs, truth, k)

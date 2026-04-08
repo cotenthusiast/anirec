@@ -11,17 +11,23 @@ paths:
   train_parquet: "data/processed/train.parquet"
   val_parquet: "data/processed/val.parquet"
   test_parquet: "data/processed/test.parquet"
+  models_dir: "models"
+  svd_model_path: "models/svd"
 
 prepare:
-  drop_nonpositive: false
   sample_n: 200_000
   threads: 4
 
 split:
   positive_threshold: 8.0
   min_positive_per_user: 15
+  holdout_per_user: 5
   seed: "42"
   threads: 4
+
+inspect:
+  threads: 4
+  min_ratings_display: 3
 
 eval:
   default_k: 10

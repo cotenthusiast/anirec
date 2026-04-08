@@ -24,9 +24,11 @@ def main() -> None:
     cfg = load_config(args.config)
     ratings_path = cfg["paths"]["ratings_parquet"]
     pos_thresh = cfg["split"]["positive_threshold"]
+    threads = cfg["inspect"]["threads"]
+    min_ratings = cfg["inspect"]["min_ratings_display"]
 
     con = duckdb.connect()
-    con.execute("PRAGMA threads=4;")
+    con.execute(f"PRAGMA threads={threads};")
     con.execute("PRAGMA enable_progress_bar=true;")
 
     total_positive = con.execute(f"""
@@ -50,10 +52,10 @@ def main() -> None:
             FROM read_parquet('{ratings_path}')
             WHERE rating >= {pos_thresh}
             GROUP BY user_id
-            HAVING COUNT(*) >= 3
+            HAVING COUNT(*) >= {min_ratings}
         ) AS t
     """).fetchone()[0]
-    print(f"users with at least 3 positive animes rated: {count_3plus}")
+    print(f"users with at least {min_ratings} positive animes rated: {count_3plus}")
 
     con.close()
 
